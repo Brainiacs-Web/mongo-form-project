@@ -15,7 +15,6 @@ mongoose.connect(mongoUri)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-
 // Mongo Schema
 const User = mongoose.model('User', new mongoose.Schema({
   username: String,
@@ -39,4 +38,5 @@ app.get('/get-users', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ Access your app at https://YOUR_RENDER_SERVICE_NAME.onrender.com`);
 });
