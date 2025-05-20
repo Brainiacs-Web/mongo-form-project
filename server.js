@@ -1,20 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const path = require('path');
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
-
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Define a route for the root path
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.use(express.json());  // Use express.json() instead of bodyParser.json()
 
 // MongoDB connection
 const mongoUri = process.env.MONGODB_URI;
@@ -28,18 +19,33 @@ const User = mongoose.model('User', new mongoose.Schema({
   password: String,
 }));
 
-// Add user endpoint
+// API routes - place before static serving
 app.post('/add-user', async (req, res) => {
-  const { username, password } = req.body;
-  const user = new User({ username, password });
-  await user.save();
-  res.json({ message: 'User saved' });
+  try {
+    console.log('Incoming /add-user request body:', req.body);
+
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password are required' });
+    }
+
+    const user = new User({ username, password });
+    await user.save();
+
+    res.json({ message: 'User saved successfully' });
+  } catch (error) {
+    console.error('❌ Error in /add-user:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
-// Get users endpoint
-app.get('/get-users', async (req, res) => {
-  const users = await User.find();
-  res.json(users);
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve index.html for root
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
