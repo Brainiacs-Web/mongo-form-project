@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head><title>All Users</title></head>
+<body>
+  <h2>Saved Users:</h2>
+  <ul id="userList"></ul>
+
+  <script>
+    fetch('/get-users')
+      .then(res => res.json())
+      .then(data => {
+        const ul = document.getElementById('userList');
+        data.forEach(user => {
+          const li = document.createElement('li');
+          li.innerText = `Username: ${user.username} | Password: ${user.password}`;
+          ul.appendChild(li);
+        });
+      });
+  </script>
+</body>
+</html>
