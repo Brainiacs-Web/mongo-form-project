@@ -38,5 +38,7 @@ app.get('/get-users', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
-  console.log(`✅ Access your app at https://YOUR_RENDER_SERVICE_NAME.onrender.com`);
+  console.log(`✅ Access your app at https://mongo-form-project.onrender.com
+
+`);
 });
