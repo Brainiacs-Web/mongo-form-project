@@ -9,11 +9,12 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '/public')));
 
-// Connect to MongoDB
-mongoose.connect('mongodb+srv://brainiacsypt:IWv5NNn1IvIPWvw8@cluster0.ryi31nz.mongodb.net/mydb?retryWrites=true&w=majority', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
+const mongoUri = process.env.MONGODB_URI;
+
+mongoose.connect(mongoUri)
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
+
 
 // Mongo Schema
 const User = mongoose.model('User', new mongoose.Schema({
@@ -35,6 +36,7 @@ app.get('/get-users', async (req, res) => {
   res.json(users);
 });
 
-app.listen(3000, () => {
-  console.log('✅ Server running on http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
