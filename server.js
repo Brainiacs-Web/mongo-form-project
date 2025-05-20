@@ -7,10 +7,17 @@ const path = require('path');
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, '/public')));
 
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Define a route for the root path
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// MongoDB connection
 const mongoUri = process.env.MONGODB_URI;
-
 mongoose.connect(mongoUri)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
@@ -21,7 +28,7 @@ const User = mongoose.model('User', new mongoose.Schema({
   password: String,
 }));
 
-// Add user
+// Add user endpoint
 app.post('/add-user', async (req, res) => {
   const { username, password } = req.body;
   const user = new User({ username, password });
@@ -29,7 +36,7 @@ app.post('/add-user', async (req, res) => {
   res.json({ message: 'User saved' });
 });
 
-// Get users
+// Get users endpoint
 app.get('/get-users', async (req, res) => {
   const users = await User.find();
   res.json(users);
@@ -38,7 +45,4 @@ app.get('/get-users', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
-  console.log(`✅ Access your app at https://mongo-form-project.onrender.com
-
-`);
 });
