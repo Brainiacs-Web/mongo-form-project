@@ -1,13 +1,541 @@
 <!DOCTYPE html>
-<html>
-<head><title>Register</title></head>
-<body>
-  <h2>Register User</h2>
-  <input id="username" type="text" placeholder="Username"><br><br>
-  <input id="password" type="password" placeholder="Password"><br><br>
-  <button onclick="submitForm()">Login</button><br><br>
-  <button onclick="location.href='check.html'">Check</button>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> Admin</title>
+  
+  <!-- Google Fonts and Font Awesome (same as before) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link 
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" 
+    rel="stylesheet" 
+  />
+  <link 
+    rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" 
+  />
 
-  <script src="js/form.js"></script>
+  <style>
+  /* … (Same CSS as your old file; no changes needed) … */
+  :root {
+    --primary-color: #1E40AF;
+    --secondary-color: #2563EB;
+    --accent-color: #9333EA;
+    --light-bg: #F1F5F9;
+    --white: #ffffff;
+    --text-color: #1E293B;
+    --hover-bg: rgba(30, 64, 175, 0.05);
+    --card-shadow: rgba(0, 0, 0, 0.08);
+    --transition-speed: 0.3s;
+    --sidebar-width: 240px;
+  }
+
+  body.dark-mode {
+    --primary-color: #60A5FA;
+    --secondary-color: #3B82F6;
+    --accent-color: #C084FC;
+    --light-bg: #0F172A;
+    --white: #1E293B;
+    --text-color: #E2E8F0;
+    --hover-bg: rgba(96, 165, 250, 0.1);
+    --card-shadow: rgba(0, 0, 0, 0.4);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
+
+  body {
+    background: var(--light-bg);
+    color: var(--text-color);
+    line-height: 1.6;
+    transition: background var(--transition-speed), color var(--transition-speed);
+  }
+
+  /* Layout */
+  #admin-dashboard {
+    display: flex;
+    min-height: 100vh;
+  }
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-width);
+    height: 100%;
+    background: var(--white);
+    box-shadow: 2px 0 5px var(--card-shadow);
+    padding: 25px 15px;
+    overflow-y: auto;
+    transition: transform var(--transition-speed);
+  }
+  .sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--primary-color);
+  }
+  .sidebar nav a {
+    display: block;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    color: var(--text-color);
+    border-radius: 6px;
+    transition: background var(--transition-speed), transform var(--transition-speed);
+  }
+  .sidebar nav a:hover,
+  .sidebar nav a.active {
+    background: var(--hover-bg);
+    transform: translateX(4px);
+  }
+
+  /* Bottom Nav for Mobile */
+  .bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100%;
+    background: var(--white);
+    box-shadow: 0 -2px 5px var(--card-shadow);
+    padding: 8px 0;
+    justify-content: space-around;
+    z-index: 1100;
+  }
+  .bottom-nav a {
+    flex: 1;
+    text-align: center;
+    color: var(--text-color);
+    transition: background var(--transition-speed);
+  }
+  .bottom-nav a.active {
+    background: var(--hover-bg);
+    color: var(--primary-color);
+  }
+  .bottom-nav a i {
+    font-size: 1.5rem;
+  }
+  @media (max-width: 480px) {
+    .sidebar { display: none; }
+    .main-content {
+      margin-left: 0;
+      width: 100%;
+      padding: 20px;
+    }
+    .bottom-nav { display: flex; }
+  }
+
+  /* FAB */
+  .fab {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    width: 50px; height: 50px;
+    background: var(--primary-color);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    box-shadow: 0 2px 5px var(--card-shadow);
+    transition: transform var(--transition-speed);
+    cursor: grab;
+  }
+  .fab:hover {
+    transform: scale(1.1);
+  }
+
+  /* Main Content */
+  .main-content {
+    margin-left: calc(var(--sidebar-width) + 20px);
+    padding: 40px 20px;
+    width: calc(100% - var(--sidebar-width) - 20px);
+    background: var(--light-bg);
+    transition: margin var(--transition-speed);
+  }
+  @media (max-width: 768px) {
+    .main-content { padding: 30px 15px; }
+  }
+
+  /* Cards & Forms */
+  .card {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 10px var(--card-shadow);
+    margin-bottom: 30px;
+  }
+  .card h2 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  form label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  form input,
+  form select,
+  form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+    background: var(--white);
+  }
+  form input:focus,
+  form select:focus,
+  form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px var(--hover-bg);
+  }
+  form button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    background: var(--primary-color);
+    color: var(--white);
+    cursor: pointer;
+    transition: background var(--transition-speed), transform var(--transition-speed);
+  }
+  form button:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  table th,
+  table td {
+    padding: 12px;
+    border: 1px solid #eee;
+    text-align: left;
+  }
+  table th {
+    background: var(--white);
+    font-weight: 600;
+  }
+
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-content {
+    background: var(--white);
+    padding: 30px;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px var(--card-shadow);
+    position: relative;
+  }
+  .modal-content .close {
+    position: absolute;
+    top: 12px; right: 20px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #aaa;
+    transition: color var(--transition-speed), transform var(--transition-speed);
+  }
+  .modal-content .close:hover {
+    color: var(--primary-color);
+    transform: rotate(90deg);
+  }
+
+  /* Test Cards & Buttons */
+  .test-card {
+    background: var(--white);
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px var(--card-shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .test-card h3 {
+    color: var(--primary-color);
+    margin-bottom: 8px;
+  }
+  .btn-group button {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 4px;
+    background: var(--primary-color);
+    color: var(--white);
+    cursor: pointer;
+    transition: background var(--transition-speed), transform var(--transition-speed);
+  }
+  .btn-group button:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+  }
+  </style>
+
+</head>
+<body>
+  <div id="admin-dashboard">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <h2>PWians</h2>
+      <nav>
+        <a href="#" data-tab="test-setup" class="active"><i class="fas fa-cogs"></i> Setup</a>
+        <a href="#" data-tab="add-question"><i class="fas fa-plus-circle"></i> Add Qs</a>
+        <a href="#" data-tab="test-preview"><i class="fas fa-eye"></i> Preview</a>
+        <a href="#" data-tab="chapters"><i class="fas fa-book"></i> Chapters</a>
+      </nav>
+    </div>
+
+    <!-- BOTTOM NAV (Mobile) -->
+    <div class="bottom-nav">
+      <a href="#" data-tab="test-setup" class="active"><i class="fas fa-cogs"></i></a>
+      <a href="#" data-tab="add-question"><i class="fas fa-plus-circle"></i></a>
+      <a href="#" data-tab="test-preview"><i class="fas fa-eye"></i></a>
+      <a href="#" data-tab="chapters"><i class="fas fa-book"></i></a>
+    </div>
+
+    <!-- FLOATING FAB -->
+    <div class="fab" id="fab"><i class="fas fa-plus"></i></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+      <!-- ── TEST SETUP SECTION ───────────────────────────────────────────── -->
+      <section id="test-setup-section" class="card">
+        <h2>Setup</h2>
+        <form id="test-setup-form">
+          <label for="testName">Test Name</label>
+          <input type="text" id="testName" required />
+
+          <label for="batchSelect">Batch</label>
+          <select id="batchSelect" required>
+            <option value="">--Select Batch--</option>
+          </select>
+
+          <label for="testDuration">Duration (min)</label>
+          <input type="number" id="testDuration" required />
+
+          <label for="subjects">Subjects (comma-sep)</label>
+          <input 
+            type="text" 
+            id="subjects" 
+            placeholder="Physics, Chem, Bio" 
+            required 
+          />
+
+          <label for="scheduledDate">Schedule</label>
+          <input 
+            type="datetime-local" 
+            id="scheduledDate" 
+            required 
+          />
+
+          <button type="submit">Create Test</button>
+        </form>
+      </section>
+
+      <!-- ── ADD QUESTION SECTION ─────────────────────────────────────────── -->
+      <section id="add-question-section" class="card" style="display:none;">
+        <h2>Add Qs</h2>
+        <form id="question-form">
+
+          <label for="questionBatch">Batch</label>
+          <select id="questionBatch" required>
+            <option value="">--Select Batch--</option>
+          </select>
+
+          <label for="testSeries">Series</label>
+          <select id="testSeries" required>
+            <option value="">--Select Series--</option>
+          </select>
+
+          <label for="subject">Subject</label>
+          <select id="subject" required>
+            <option value="">--Select Subject--</option>
+          </select>
+
+          <label for="question">Question</label>
+          <input 
+            type="text" 
+            id="question" 
+            placeholder="Enter question" 
+          />
+
+          <label for="questionImageURL">Image URL</label>
+          <input 
+            type="text" 
+            id="questionImageURL" 
+            placeholder="Paste image URL" 
+          />
+
+          <label for="questionType">Type</label>
+          <select id="questionType" required>
+            <option value="">--Select Type--</option>
+            <option value="MCQ">MCQ</option>
+            <option value="Integer">Integer</option>
+          </select>
+
+          <div id="mcq-section" style="display:none;">
+            <div style="display:flex;gap:10px;">
+              <div style="flex:1;">
+                <label for="optionA">A</label>
+                <input 
+                  type="text" 
+                  id="optionA" 
+                  placeholder="Option A" 
+                />
+              </div>
+              <div style="flex:1;">
+                <label for="optionB">B</label>
+                <input 
+                  type="text" 
+                  id="optionB" 
+                  placeholder="Option B" 
+                />
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <div style="flex:1;">
+                <label for="optionC">C</label>
+                <input 
+                  type="text" 
+                  id="optionC" 
+                  placeholder="Option C" 
+                />
+              </div>
+              <div style="flex:1;">
+                <label for="optionD">D</label>
+                <input 
+                  type="text" 
+                  id="optionD" 
+                  placeholder="Option D" 
+                />
+              </div>
+            </div>
+            <label for="correctAnswer">Answer</label>
+            <select id="correctAnswer">
+              <option value="">--Select--</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+            </select>
+          </div>
+
+          <div id="integer-section" style="display:none;">
+            <label for="integerAnswer">Answer</label>
+            <input 
+              type="number" 
+              id="integerAnswer" 
+              placeholder="Enter answer" 
+            />
+          </div>
+
+          <label for="solution">Solution</label>
+          <input 
+            type="text" 
+            id="solution" 
+            placeholder="Enter solution" 
+          />
+
+          <label for="solutionImageURL">Solution Image URL</label>
+          <input 
+            type="text" 
+            id="solutionImageURL" 
+            placeholder="Paste solution URL" 
+          />
+
+          <div style="text-align:center;">
+            <button type="button" id="previewBtn">Preview</button>
+            <button type="reset">Clear</button>
+            <button type="submit">Add Q</button>
+          </div>
+        </form>
+
+        <!-- Preview Modal -->
+        <div id="previewModal" class="modal">
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Preview</h2>
+            <div id="previewContent"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── TEST PREVIEW SECTION ──────────────────────────────────────────── -->
+      <section id="test-preview-section" class="card" style="display:none;">
+        <h2>Preview</h2>
+        <div id="testPreviewContainer"></div>
+      </section>
+
+      <!-- ── CHAPTERS SECTION ──────────────────────────────────────────────── -->
+      <section id="chapters-section" class="card" style="display:none;">
+        <h2>Subject Chapters</h2>
+        <form id="chapter-form">
+          <label for="chapterBatch">Batch</label>
+          <select id="chapterBatch" required>
+            <option value="">--Select Batch--</option>
+          </select>
+
+          <label for="chapterSeries">Series</label>
+          <select id="chapterSeries" required>
+            <option value="">--Select Series--</option>
+          </select>
+
+          <label for="chapterSubject">Subject</label>
+          <select id="chapterSubject" required>
+            <option value="">--Select Subject--</option>
+          </select>
+
+          <label for="chapterName">Chapter Name</label>
+          <input 
+            type="text" 
+            id="chapterName" 
+            placeholder="e.g. Kinematics" 
+            required 
+          />
+
+          <button type="submit">Add Chapter</button>
+        </form>
+        <h3 style="margin-top:20px;">Existing Chapters</h3>
+        <ul id="chaptersList"></ul>
+      </section>
+    </div>
+  </div>
+
+  <!-- BATCH MODAL -->
+  <div id="batchModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Add Batch</h2>
+      <form id="batch-form">
+        <label for="batchName">Batch Name</label>
+        <input type="text" id="batchName" required />
+        <button type="submit">Add Batch</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Include the new client-side JS ─────────────────────────────────── -->
+  <script src="js/app.js"></script>
+
 </body>
 </html>
